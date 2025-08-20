@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"slices"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 type Todo struct {
@@ -17,6 +20,14 @@ type Todo struct {
 func main() {
 	fmt.Println("hello world")
 	app := gin.Default()
+
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	PORT := os.Getenv("PORT")
 
 	todos := []Todo{}
 
@@ -78,6 +89,6 @@ func main() {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": "Could not Delete"})
 	})
 
-	app.Run(":4000")
+	app.Run(PORT)
 
 }

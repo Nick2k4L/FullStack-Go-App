@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"slices"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,8 +20,8 @@ func main() {
 
 	todos := []Todo{}
 
-	app.GET("/", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{"msg": "hello world"})
+	app.GET("/api/todos", func(c *gin.Context) {
+		c.JSON(http.StatusOK, todos)
 	})
 
 	fmt.Println("Before the post")
@@ -60,6 +61,21 @@ func main() {
 
 		c.JSON(http.StatusBadRequest, gin.H{"Error": "No id has been found"})
 
+	})
+
+	app.DELETE("/api/todos/:id", func(c *gin.Context) {
+		id := c.Param("id")
+
+		for i, todo := range todos {
+			if fmt.Sprint(todo.ID) == id {
+				todos = slices.Delete(todos, i, i+1)
+				c.JSON(http.StatusAccepted, gin.H{"Success": fmt.Sprintf("Successfully deleted Id number: %d", i+1)})
+				return
+
+			}
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{"Error": "Could not Delete"})
 	})
 
 	app.Run(":4000")
